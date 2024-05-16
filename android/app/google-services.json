@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "944804183410",
+    "project_id": "burada-app-v3",
+    "storage_bucket": "burada-app-v3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944804183410:android:f232654c4144068e11b1eb",
+        "android_client_info": {
+          "package_name": "com.omerakyuz.burada.burada"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-1xsIq_tl7wHkplX3ZinJLM5ZnfO_bFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
