@@ -20,7 +20,7 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
   @override
   Widget build(BuildContext context) {
     return StudentBasePage(
-      title: 'Attendance',
+      title: 'Yoklama',
       currentPageIndex: _currentPageIndex,
       buildBody: (context) => FutureBuilder(
         future: getSubjectsForCurrentSemester(),

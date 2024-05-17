@@ -25,7 +25,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
   @override
   Widget build(BuildContext context) {
     return TeacherBasePage(
-      title: 'Dashboard',
+      title: 'Kontrol Paneli',
       currentPageIndex: _currentPageIndex,
       buildBody: (context) => StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance

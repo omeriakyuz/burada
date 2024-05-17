@@ -21,7 +21,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
   @override
   Widget build(BuildContext context) {
     return StudentBasePage(
-      title: 'Dashboard',
+      title: 'Kontrol Paneli',
       currentPageIndex: _currentPageIndex,
       buildBody: (context) => FutureBuilder(
         future: getSubjectsForCurrentSemester(),
@@ -98,7 +98,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
                               textStyle: const TextStyle(fontSize: 15),
                             ),
                             child: const Text(
-                              'Attend',
+                              'Katıl',
                               style: TextStyle(color: Colors.black),
                             ),
                           ),

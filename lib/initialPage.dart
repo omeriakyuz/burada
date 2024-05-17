@@ -48,7 +48,7 @@ class _ChooseRolePageState extends State<ChooseRolePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              "Select your position",
+              "Durumunu seç",
               style: TextStyle(
                   fontSize: 30, color: darkest, fontWeight: FontWeight.w600),
             ),
@@ -56,7 +56,7 @@ class _ChooseRolePageState extends State<ChooseRolePage> {
             const SizedBox(
                 width: 250,
                 child: Text(
-                  'Choose your role and login with your credentials to continue to the app.',
+                  'Uygulamaya devam etmek için rolünü seç ve bilgilerini girerek giriş yap.',
                   textAlign: TextAlign.center,
                 )),
             const SizedBox(height: 60),
@@ -69,17 +69,18 @@ class _ChooseRolePageState extends State<ChooseRolePage> {
                 );
               },
               style: ElevatedButton.styleFrom(
+
                 backgroundColor: middle,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.only(
-                  left: 50,
-                  right: 50,
+                  left: 60,
+                  right: 60,
                   top: 15,
                   bottom: 15,
                 ),
               ),
               child: const Text(
-                'Student',
+                'Öğrenci',
                 style: TextStyle(fontSize: 18),
               ),
             ),
@@ -103,7 +104,7 @@ class _ChooseRolePageState extends State<ChooseRolePage> {
                 ),
               ),
               child: const Text(
-                'Teacher',
+                'Öğretmen',
                 style: TextStyle(fontSize: 18),
               ),
             ),

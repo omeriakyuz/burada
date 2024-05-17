@@ -1,3 +1,4 @@
+
 import 'package:burada/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,7 +50,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                 );
               })
         ],
-        title: const Text('Login as Student'),
+        title: const Text('Öğrenci olarak giriş yap'),
       ),
       body: Center(
         child: Column(
@@ -57,7 +58,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'Login with Fingerprint',
+              'Parmak izini doğrula',
               style: TextStyle(
                   fontSize: 30, color: darkest, fontWeight: FontWeight.w600),
             ),
@@ -67,14 +68,14 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
             const SizedBox(
                 width: 350,
                 child: Text(
-                  'Click on the icon below to authenticate yourself with your fingerprint and continue to the app.',
+                  'Alttaki ikonu kullanarak parmak izini doğrula ve uygulamaya devam et.',
                   textAlign: TextAlign.center,
                 )),
             IconButton(
               onPressed: _authenticate,
               icon: const Icon(Icons.fingerprint_outlined),
               iconSize: 300.0, // Adjust size as needed
-              tooltip: 'Authenticate with Biometrics',
+              tooltip: 'Biyometrik doğrulama',
               color: secondDark,
             ),
           ],
@@ -87,13 +88,13 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     try {
       bool authenticated = await auth.authenticate(
           localizedReason:
-              'You must authenticate yourself to continue to the app.',
+              'Uygulamaya devam etmek için doğrulamayı yapmalısın.',
           options: const AuthenticationOptions(
             stickyAuth: true,
             biometricOnly: true,
           ));
 
-      print('Authenticated: $authenticated');
+      print('Doğrulandı: $authenticated');
       if (authenticated) {
         // Navigate to the main page
         Navigator.pushAndRemoveUntil(
@@ -111,10 +112,11 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     List<BiometricType> availableBiometrics =
         await auth.getAvailableBiometrics();
 
-    print("List of available biometrics: $availableBiometrics");
+    print("Mevcut biyometriklerin listesi: $availableBiometrics");
 
     if (!mounted) {
       return;
     }
   }
 }
+

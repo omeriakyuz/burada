@@ -21,7 +21,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Attendance'),
+        title: const Text('Yoklama'),
         backgroundColor: darkest,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: true,
@@ -63,25 +63,25 @@ class _AttendanceTableState extends State<AttendanceTable> {
                   columns: <DataColumn>[
                     DataColumn(
                       label: Text(
-                        'Roll No',
+                        'Öğr. No',
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),
                     const DataColumn(
                       label: Text(
-                        'Name',
+                        'İsim',
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),
                     DataColumn(
                       label: Text(
-                        DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                        DateFormat('dd-MM-yyyy').format(DateTime.now()),
                         style: const TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),
                     const DataColumn(
                       label: Text(
-                        'Phone Number',
+                        'Telefon No.',
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),

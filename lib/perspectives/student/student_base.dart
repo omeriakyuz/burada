@@ -72,7 +72,7 @@ class StudentBasePage extends StatelessWidget {
               tabs: [
                 GButton(
                   icon: Icons.home,
-                  text: 'Home',
+                  text: 'Anasayfa',
                   onPressed: () {
                     Navigator.of(context).push(
                       PageTransitionAnimation(
@@ -84,7 +84,7 @@ class StudentBasePage extends StatelessWidget {
                 ),
                 GButton(
                   icon: Icons.assignment,
-                  text: 'Attendance',
+                  text: 'Yoklama',
                   onPressed: () {
                     Navigator.of(context).push(
                       PageTransitionAnimation(
@@ -109,7 +109,7 @@ class StudentBasePage extends StatelessWidget {
                 ),
                 padding: EdgeInsets.all(20),
                 child: Text(
-                  'Menu',
+                  'Menü',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 30,
@@ -118,7 +118,7 @@ class StudentBasePage extends StatelessWidget {
               ),
             ),
             ListTile(
-              title: const Text('Settings'),
+              title: const Text('Ayarlar'),
               onTap: () {
                 Navigator.of(context).push(
                   PageTransitionAnimation(
@@ -128,7 +128,7 @@ class StudentBasePage extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('About Us'),
+              title: const Text('Hakkında'),
               onTap: () {
                 Navigator.of(context).push(
                   PageTransitionAnimation(

@@ -73,7 +73,7 @@ class TeacherBasePage extends StatelessWidget {
               tabs: [
                 GButton(
                   icon: Icons.home,
-                  text: 'Home',
+                  text: 'Anasayfa',
                   onPressed: () {
                     Navigator.of(context).push(
                       PageTransitionAnimation(
@@ -85,7 +85,7 @@ class TeacherBasePage extends StatelessWidget {
                 ),
                 GButton(
                   icon: Icons.add_circle_outline_outlined,
-                  text: 'Add Class',
+                  text: 'Sınıf Ekle',
                   onPressed: () {
                     Navigator.of(context).push(
                       PageTransitionAnimation(
@@ -97,7 +97,7 @@ class TeacherBasePage extends StatelessWidget {
                 ),
                 GButton(
                   icon: Icons.assignment,
-                  text: 'Attendance',
+                  text: 'Yoklama',
                   onPressed: () {
                     Navigator.of(context).push(
                       PageTransitionAnimation(
@@ -122,7 +122,7 @@ class TeacherBasePage extends StatelessWidget {
                 ),
                 padding: EdgeInsets.all(20),
                 child: Text(
-                  'Menu',
+                  'Menü',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 30,
@@ -131,7 +131,7 @@ class TeacherBasePage extends StatelessWidget {
               ),
             ),
             ListTile(
-              title: const Text('Settings'),
+              title: const Text('Ayarlar'),
               onTap: () {
                 Navigator.of(context).push(
                   PageTransitionAnimation(
@@ -141,7 +141,7 @@ class TeacherBasePage extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('About Us'),
+              title: const Text('Hakkında'),
               onTap: () {
                 Navigator.of(context).push(
                   PageTransitionAnimation(

@@ -7,6 +7,7 @@ import 'package:intl_phone_field/countries.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:burada/perspectives/student/login.dart';
+import 'package:burada/perspectives/student/home.dart';
 import 'package:burada/info.dart';
 import 'package:burada/animation.dart';
 
@@ -35,7 +36,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
       phoneNumber: userNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         await auth.signInWithCredential(credential).then(
-              (value) => print('Logged In Successfully'),
+              (value) => print('Giriş başarılı.'),
             );
       },
       verificationFailed: (FirebaseAuthException e) {
@@ -63,8 +64,8 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
         .then((value) => createUserDocument(value.user!));
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const StudentLoginPage()),
-      (route) => false,
+      MaterialPageRoute(builder: (context) => const StudentHomePage()),
+          (route) => false,
     );
   }
 
@@ -118,7 +119,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                 })
           ],
           title: const Text(
-            'Verify yourself',
+            'Doğrulama',
           ),
           centerTitle: true,
         ),
@@ -137,7 +138,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                   },
                   decoration: InputDecoration(
                     hintText: '077bei001',
-                    labelText: 'Roll No',
+                    labelText: 'Öğrenci Numarası',
                     // labelStyle: TextStyle(color: darkest),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -155,7 +156,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                   controller: nameController,
                   decoration: InputDecoration(
                     hintText: 'John Doe',
-                    labelText: 'Name',
+                    labelText: 'İsim',
                     // labelStyle: TextStyle(color: darkest),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -173,7 +174,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                   controller: semesterController,
                   decoration: InputDecoration(
                     hintText: 'III/II',
-                    labelText: 'Semester',
+                    labelText: 'Dönem',
                     // labelStyle: TextStyle(color: darkest),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -192,18 +193,18 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                   controller: phoneController,
                   countries: const [
                     Country(
-                      name: "Nepal",
+                      name: "Türkiye",
                       nameTranslations: {},
-                      flag: "🇳🇵",
-                      code: "NP",
-                      dialCode: "977",
+                      flag: "🇹🇷",
+                      code: "TR",
+                      dialCode: "90",
                       minLength: 10,
                       maxLength: 10,
                     )
                   ], // Restrict to Nepal
                   decoration: InputDecoration(
-                    hintText: '9841000000',
-                    labelText: 'Phone',
+                    hintText: 'xxxxxxxxxx',
+                    labelText: 'Telefon Numarası',
                     // labelStyle: TextStyle(color: darkest),
                     border: OutlineInputBorder(
                       // borderSide: BorderSide(color: darkest),
@@ -226,8 +227,8 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                   child: TextField(
                     controller: otpController,
                     decoration: InputDecoration(
-                      hintText: 'OTP Code',
-                      labelText: 'OTP',
+                      hintText: 'Doğrulama Kodu',
+                      labelText: 'Kod',
                       // labelStyle: TextStyle(color: darkest),
                       border: OutlineInputBorder(
                         borderSide: const BorderSide(color: darkest),
@@ -259,7 +260,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                     ),
                     backgroundColor: secondDark,
                     foregroundColor: Colors.white),
-                child: const Text('Verify'),
+                child: const Text('Doğrula'),
               ),
               const SizedBox(height: 10),
             ],

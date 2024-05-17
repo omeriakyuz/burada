@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
         '/teacher_addclass': (context) => const AddClass(),
       },
       debugShowCheckedModeBanner: false,
-      title: 'BLE Peripheral',
+      title: 'Burada',
       theme: ThemeData(
         textTheme: GoogleFonts.nunitoTextTheme(),
         primarySwatch: Colors.blue,
@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Attend Class'),
+          title: const Text('Dersin Yoklamasına Katıl'),
           backgroundColor: darkest,
           foregroundColor: Colors.white,
           automaticallyImplyLeading: true,
@@ -116,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                'ROLL NUMBER: \n $rollNumber',
+                'ÖĞRENCİ NUMARAN: \n $rollNumber',
                 style: const TextStyle(
                     fontSize: 30, color: darkest, fontWeight: FontWeight.w600),
                 textAlign: TextAlign.center,
@@ -141,13 +141,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 child:
-                Text(isAdvertising ? 'Stop Attending' : 'Start Attending'),
+                Text(isAdvertising ? 'Yoklamayı Durdur' : 'Yoklamayı Başlat'),
               ),
               if (isAdvertising)
                 const SizedBox(
                     height: 50,
                     child: Center(
-                      child: Text('You are attending the class...',
+                      child: Text('Dersin yoklamasına katılıyorsun...',
                           style: TextStyle(
                               fontSize: 18,
                               color: Colors.green,

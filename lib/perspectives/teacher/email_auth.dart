@@ -91,7 +91,7 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
                 })
           ],
           title: const Text(
-            'Email Authentication',
+            'E-Posta Doğrulama',
           ),
           centerTitle: true,
         ),
@@ -107,8 +107,8 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
                 child: TextField(
                   controller: emailController,
                   decoration: InputDecoration(
-                    hintText: 'Email',
-                    labelText: 'Email',
+                    hintText: 'E-Posta',
+                    labelText: 'E-Posta',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -124,8 +124,8 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
                         value; // Update the global value when text changes
                   },
                   decoration: InputDecoration(
-                    hintText: 'Name',
-                    labelText: 'Name',
+                    hintText: 'İsim',
+                    labelText: 'İsim',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -138,8 +138,8 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
                   obscureText: true,
                   controller: passwordController,
                   decoration: InputDecoration(
-                    hintText: 'Password',
-                    labelText: 'Password',
+                    hintText: 'Şifre',
+                    labelText: 'Şifre',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -161,7 +161,7 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
                     ),
                     backgroundColor: secondDark,
                     foregroundColor: Colors.white),
-                child: const Text('Sign In'),
+                child: const Text('Üye Ol'),
               ),
               SizedBox(height: 120),
             ],

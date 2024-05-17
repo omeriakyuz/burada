@@ -24,20 +24,20 @@ class _AddClassState extends State<AddClass> {
   TextEditingController customSubjectController = TextEditingController();
 
   List<String> subjects = [
-    'Communication English',
-    'Communication System',
-    'Project Management',
-    'Embedded System',
-    'Propagation and Antenna',
-    'Object Oriented Software Engineering',
+    'Nesneye Yönelik Programlama',
+    'Algoritmalar',
+    'Veritabanı',
+    'Fizik II',
+    'Python Programlamaya Giriş',
+    'Ayrık Matematik',
   ];
 
   List<String> faculties = [
-    'BEI',
-    'BCT',
-    'BCE',
-    'BArch',
-    'BME',
+    'Bilgisayar Mühendisliği',
+    'A',
+    'B',
+    'C',
+    'E',
   ];
 
   List<String> semesters = [
@@ -81,7 +81,7 @@ class _AddClassState extends State<AddClass> {
             children: [
               Icon(Icons.check, color: Colors.white),
               SizedBox(width: 8),
-              Text('Subject Added successfully'),
+              Text('Ders başarıyla eklendi.'),
             ],
           ),
           backgroundColor: Colors.green,
@@ -95,16 +95,16 @@ class _AddClassState extends State<AddClass> {
         selectedFaculty = faculties.first;
         selectedSemester = semesters.length >= 6 ? semesters[5] : null;
       });
-      print('Class added successfully.');
+      print('Ders eklendi.');
     } catch (e) {
-      print('Failed to add class: $e');
+      print('Ders ekleme hatası: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return TeacherBasePage(
-        title: 'Add Subject',
+        title: 'Ders ekleme',
         key: _scaffoldKey,
         currentPageIndex: 1,
         buildBody: (context) {
@@ -118,7 +118,7 @@ class _AddClassState extends State<AddClass> {
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: customSubjectController,
                     decoration: InputDecoration(
-                      labelText: 'Subject',
+                      labelText: 'Ders',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -158,7 +158,7 @@ class _AddClassState extends State<AddClass> {
                     );
                   }).toList(),
                   decoration: const InputDecoration(
-                    labelText: 'Faculty',
+                    labelText: 'Fakülte',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -179,7 +179,7 @@ class _AddClassState extends State<AddClass> {
                     );
                   }).toList(),
                   decoration: const InputDecoration(
-                    labelText: 'Semester',
+                    labelText: 'Dönem',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -199,7 +199,7 @@ class _AddClassState extends State<AddClass> {
                     addSubject();
                   },
                   child: const Text(
-                    'Submit',
+                    'Gönder',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
