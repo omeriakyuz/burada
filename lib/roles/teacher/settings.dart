@@ -1,17 +1,17 @@
 import 'package:burada/colors.dart';
-import 'package:burada/perspectives/student/home.dart';
+import 'package:burada/roles/teacher/home.dart';
 import 'package:flutter/material.dart';
 import 'package:burada/info.dart';
 import 'package:burada/animation.dart';
 
-class StudentSettingsPage extends StatefulWidget {
-  const StudentSettingsPage({super.key});
+class TeacherSettingsPage extends StatefulWidget {
+  const TeacherSettingsPage({super.key});
 
   @override
-  _StudentSettingsPageState createState() => _StudentSettingsPageState();
+  _TeacherSettingsPageState createState() => _TeacherSettingsPageState();
 }
 
-class _StudentSettingsPageState extends State<StudentSettingsPage> {
+class _TeacherSettingsPageState extends State<TeacherSettingsPage> {
   bool notificationSwitchValue = true;
   double volumeSliderValue = 50.0;
 
@@ -81,7 +81,7 @@ class _StudentSettingsPageState extends State<StudentSettingsPage> {
               onPressed: () {
                 Navigator.of(context).push(
                   PageTransitionAnimation(
-                    page: StudentHomePage(),
+                    page: TeacherHomePage(),
                   ),
                 );
               },

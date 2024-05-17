@@ -1,20 +1,19 @@
-import 'package:burada/perspectives/teacher/addclass.dart';
-import 'package:burada/perspectives/teacher/check_attendance.dart';
-import 'package:burada/perspectives/teacher/home.dart';
+import 'package:burada/roles/student/check_attendance.dart';
+import 'package:burada/roles/student/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:burada/colors.dart';
 import 'package:burada/info.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:burada/perspectives/teacher/settings.dart';
+import 'package:burada/roles/student/settings.dart';
 import 'package:burada/animation.dart';
 
-class TeacherBasePage extends StatelessWidget {
+class StudentBasePage extends StatelessWidget {
   final String title;
   final Widget Function(BuildContext) buildBody;
   final int currentPageIndex;
 
-  const TeacherBasePage({
+  const StudentBasePage({
     Key? key,
     required this.title,
     required this.buildBody,
@@ -60,7 +59,7 @@ class TeacherBasePage extends StatelessWidget {
         color: darkest,
         height: 60,
         child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 0),
             child: GNav(
               // tabMargin: EdgeInsets.all(1),
               iconSize: 30,
@@ -77,19 +76,7 @@ class TeacherBasePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).push(
                       PageTransitionAnimation(
-                        page: TeacherHomePage(),
-                      ),
-                    );
-                  },
-                  padding: EdgeInsets.all(10),
-                ),
-                GButton(
-                  icon: Icons.add_circle_outline_outlined,
-                  text: 'Sınıf Ekle',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransitionAnimation(
-                        page: AddClass(),
+                        page: StudentHomePage(),
                       ),
                     );
                   },
@@ -101,7 +88,7 @@ class TeacherBasePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).push(
                       PageTransitionAnimation(
-                        page: TeacherAttendancePage(),
+                        page: StudentAttendancePage(),
                       ),
                     );
                   },
@@ -135,7 +122,7 @@ class TeacherBasePage extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   PageTransitionAnimation(
-                    page: TeacherSettingsPage(),
+                    page: StudentSettingsPage(),
                   ),
                 );
               },

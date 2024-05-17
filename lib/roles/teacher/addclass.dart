@@ -1,11 +1,11 @@
-import 'package:burada/perspectives/teacher/teacher_base.dart';
+import 'package:burada/roles/teacher/teacher_base.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:burada/perspectives/teacher/home.dart';
+import 'package:burada/roles/teacher/home.dart';
 import 'package:burada/colors.dart';
 
-import 'package:burada/perspectives/teacher/check_attendance.dart';
+import 'package:burada/roles/teacher/check_attendance.dart';
 import 'package:burada/info.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 

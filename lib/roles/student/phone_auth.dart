@@ -6,8 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_field/countries.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:burada/perspectives/student/login.dart';
-import 'package:burada/perspectives/student/home.dart';
+import 'package:burada/roles/student/login.dart';
+import 'package:burada/roles/student/home.dart';
 import 'package:burada/info.dart';
 import 'package:burada/animation.dart';
 
@@ -64,7 +64,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
         .then((value) => createUserDocument(value.user!));
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const StudentHomePage()),
+      MaterialPageRoute(builder: (context) => const StudentLoginPage()),
           (route) => false,
     );
   }

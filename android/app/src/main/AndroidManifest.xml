@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
-        android:label="burada"
+        android:label="Burada App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

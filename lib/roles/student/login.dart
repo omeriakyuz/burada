@@ -3,7 +3,7 @@ import 'package:burada/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:burada/perspectives/student/home.dart';
+import 'package:burada/roles/student/home.dart';
 import 'package:burada/info.dart';
 import 'package:burada/animation.dart';
 
@@ -68,7 +68,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
             const SizedBox(
                 width: 350,
                 child: Text(
-                  'Alttaki ikonu kullanarak parmak izini doğrula ve uygulamaya devam et.',
+                  'Parmak izi sembolüne tıklayıp doğrulamayı geç ve uygulamaya devam et.',
                   textAlign: TextAlign.center,
                 )),
             IconButton(
@@ -96,7 +96,6 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
 
       print('Doğrulandı: $authenticated');
       if (authenticated) {
-        // Navigate to the main page
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const StudentHomePage()),
@@ -119,4 +118,3 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     }
   }
 }
-

@@ -1,5 +1,5 @@
-import 'package:burada/perspectives/teacher/email_auth.dart';
-import 'package:burada/perspectives/teacher/teacher_base.dart';
+import 'package:burada/roles/teacher/email_auth.dart';
+import 'package:burada/roles/teacher/teacher_base.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

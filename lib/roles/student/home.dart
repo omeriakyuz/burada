@@ -1,5 +1,5 @@
-import 'package:burada/perspectives/student/settings.dart';
-import 'package:burada/perspectives/student/student_base.dart';
+import 'package:burada/roles/student/settings.dart';
+import 'package:burada/roles/student/student_base.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:burada/colors.dart';

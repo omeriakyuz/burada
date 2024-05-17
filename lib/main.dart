@@ -6,16 +6,16 @@ import 'package:burada/info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:burada/initialPage.dart';
-import 'package:burada/perspectives/student/check_attendance.dart';
-import 'package:burada/perspectives/student/home.dart';
-import 'package:burada/perspectives/student/login.dart';
-import 'package:burada/perspectives/student/phone_auth.dart';
-import 'package:burada/perspectives/teacher/addclass.dart';
+import 'package:burada/roles/student/check_attendance.dart';
+import 'package:burada/roles/student/home.dart';
+import 'package:burada/roles/student/login.dart';
+import 'package:burada/roles/student/phone_auth.dart';
+import 'package:burada/roles/teacher/addclass.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:burada/perspectives/teacher/check_attendance.dart';
-import 'package:burada/perspectives/teacher/home.dart';
-import 'package:burada/perspectives/teacher/email_auth.dart';
-import 'package:burada/perspectives/student/phone_auth.dart';
+import 'package:burada/roles/teacher/check_attendance.dart';
+import 'package:burada/roles/teacher/home.dart';
+import 'package:burada/roles/teacher/email_auth.dart';
+import 'package:burada/roles/student/phone_auth.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 //import 'package:burada/login.dart';
@@ -73,7 +73,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool isAdvertising = false;
   Timer? advertiseTime;
-  String uniqueUUID = const Uuid().v4();
+  // String uniqueUUID = const Uuid().v4();
   String rollNumber = rollNumberOfStudent;
   // String rollNumberOfStudent = "";
   @override
@@ -160,9 +160,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> startAdvertising() async {
-    String serviceUUID = 'bf27730d-860a-4e09-889c-2d8b6a9e0fe7';
-    // String rollNumberOfStudent = await fetchRollNumber();
-    List<int> manufactData = utf8.encode(rollNumberOfStudent);
+    String serviceUUID = '21122064-63dd-4788-9fb3-424fa29f2148';
+    List<int> manufactData = utf8.encode(rollNumber);
     print("ManufacturerData:$manufactData");
     AdvertiseData advertiseData = AdvertiseData(
       serviceUuid: serviceUUID,

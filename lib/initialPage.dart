@@ -1,7 +1,7 @@
-import 'package:burada/perspectives/student/login.dart';
-import 'package:burada/perspectives/student/phone_auth.dart';
-import 'package:burada/perspectives/teacher/email_auth.dart';
-import 'package:burada/perspectives/teacher/home.dart';
+import 'package:burada/roles/student/login.dart';
+import 'package:burada/roles/student/phone_auth.dart';
+import 'package:burada/roles/teacher/email_auth.dart';
+import 'package:burada/roles/teacher/home.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:burada/colors.dart';
