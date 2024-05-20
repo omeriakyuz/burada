@@ -47,8 +47,18 @@ class _ChooseRolePageState extends State<ChooseRolePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset(
+              'assets/images/burada-app-vector.png',
+              width: 200,
+              height: 200,
+            ),
             const Text(
-              "Durumunu seç",
+              "Burada App",
+              style: TextStyle(
+                  fontSize: 30, color: darkest, fontWeight: FontWeight.w600),
+            ),
+            const Text(
+              "Hoşgeldin!",
               style: TextStyle(
                   fontSize: 30, color: darkest, fontWeight: FontWeight.w600),
             ),
