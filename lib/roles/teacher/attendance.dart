@@ -16,7 +16,7 @@ class AttendanceTable extends StatefulWidget {
 class _AttendanceTableState extends State<AttendanceTable> {
   @override
   Widget build(BuildContext context) {
-    final databaseReference = FirebaseDatabase.instance.ref().child('BEI');
+    final databaseReference = FirebaseDatabase.instance.ref().child('CMPE');
     final firestore = FirebaseFirestore.instance;
 
     return Scaffold(
@@ -55,7 +55,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
                 );
               }
               if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
+                return Text('Hata: ${snapshot.error}');
               }
               final users = snapshot.data!.docs;
               return SingleChildScrollView(
@@ -112,7 +112,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
                                         color: Colors.white);
                                   }
                                   if (snapshot.hasError) {
-                                    return Text('Error: ${snapshot.error}');
+                                    return Text('Hata: ${snapshot.error}');
                                   }
                                   var present = snapshot.data!['present'];
                                   return DropdownButton<String>(
@@ -133,8 +133,8 @@ class _AttendanceTableState extends State<AttendanceTable> {
                                         });
                                       }
                                     },
-                                    value: present == true ? 'P' : 'A',
-                                    items: <String>['A', 'P']
+                                    value: present == true ? 'Mevcut' : 'Yok',
+                                    items: <String>['Yok', 'Mevcut']
                                         .map<DropdownMenuItem<String>>(
                                             (String value) {
                                       return DropdownMenuItem<String>(

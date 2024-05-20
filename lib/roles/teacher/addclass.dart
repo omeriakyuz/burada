@@ -53,28 +53,22 @@ class _AddClassState extends State<AddClass> {
 
   Future<void> addSubject() async {
     try {
-      // Get current user
       User? currentTeacher = FirebaseAuth.instance.currentUser;
 
-      // Retrieve user data to get the teacher's name
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('teachers')
           .doc(currentTeacher?.uid)
           .get();
 
-      // Extract the teacher's name from user data
       String teacherName = userSnapshot['name'];
 
-      // String subjectToAdd = selectedSubject ?? customSubjectController.text;
 
-      // Add the subject document with all the fields
       await FirebaseFirestore.instance.collection('subjects').add({
         'subject': customSubjectController.text,
         'faculty': selectedFaculty,
         'semester': selectedSemester,
-        'teacherName': teacherName, // Add teacher's name to the document
+        'teacherName': teacherName,
       });
-      // Show "Added successfully" message using SnackBar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -139,7 +133,7 @@ class _AddClassState extends State<AddClass> {
                     });
                   },
                   noItemsFoundBuilder: (context) {
-                    return Text('New Subject will be Added');
+                    return Text('Ders başarıyla eklendi.');
                   },
                 ),
                 const SizedBox(height: 16),

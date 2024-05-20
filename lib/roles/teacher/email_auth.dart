@@ -35,9 +35,9 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
+        print('Bu e-postaya sahip kullanıcı bulunamadı.');
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
+        print('Girmiş olduğunuz şifre hatalı.');
       }
     }
   }

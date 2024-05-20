@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:burada/colors.dart';
 import 'package:burada/main.dart';
-// import 'package:student/check_attendance.dart';
 import 'package:burada/info.dart';
 import 'package:burada/animation.dart';
 
@@ -32,7 +31,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
             );
           }
           if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return Text('Hata: ${snapshot.error}');
           }
           final subjects = snapshot.data!.docs;
           return ListView.builder(
@@ -114,11 +113,9 @@ class _StudentHomePageState extends State<StudentHomePage> {
   }
 
   Future<QuerySnapshot> getSubjectsForCurrentSemester() async {
-    // Get the current user's semester from Firestore or any other source
     String currentUserSemester =
-        'III/II'; // Example value, replace it with your logic
+        'III/II'; // Değiştirilecek
 
-    // Query subjects where the 'semester' field matches the current user's semester
     return FirebaseFirestore.instance
         .collection('subjects')
         .where('semester', isEqualTo: currentUserSemester)

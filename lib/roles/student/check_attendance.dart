@@ -14,7 +14,7 @@ class StudentAttendancePage extends StatefulWidget {
 
 class _StudentAttendancePageState extends State<StudentAttendancePage> {
   int _currentPageIndex =
-      1; // Set the initial page index to 1 for Check Attendance
+      1;
   List<bool> isExpandedList = List<bool>.generate(10, (index) => false);
 
   @override
@@ -31,7 +31,7 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
             );
           }
           if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return Text('Hata: ${snapshot.error}');
           }
           final subjects = snapshot.data!.docs;
           return ListView.builder(
@@ -55,11 +55,11 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
   }
 
   Future<QuerySnapshot> getSubjectsForCurrentSemester() async {
-    // Get the current user's semester from Firestore or any other source
+    // Firestore'dan dönem bilgisi çek
     String currentUserSemester =
-        'III/II'; // Example value, replace it with your actual logic
+        'III/II'; // Değiştirilecek
 
-    // Query subjects where the 'semester' field matches the current user's semester
+    // Güncel kullanıcının dönem sorgusu
     return FirebaseFirestore.instance
         .collection('subjects')
         .where('semester', isEqualTo: currentUserSemester)
@@ -83,18 +83,18 @@ class _SubjectCardState extends State<SubjectCard> {
   @override
   void initState() {
     super.initState();
-    fetchAttendanceStatus(); // Fetch attendance status when widget initializes
+    fetchAttendanceStatus();
   }
 
   void fetchAttendanceStatus() async {
-    // Assuming 'users' collection has 'present' field and document ID is rollNo
+
     DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
         .collection('users')
         .doc(rollNumberOfStudent)
         .get();
     setState(() {
       isPresent = userSnapshot['present'] ??
-          false; // Set isPresent based on 'present' field
+          false; // Mevcut olma durumunu set et
     });
   }
 
@@ -142,7 +142,7 @@ class _SubjectCardState extends State<SubjectCard> {
               child: Padding(
                 padding: const EdgeInsets.all(5),
                 child: Text(
-                  'Your attendance status: ${isPresent ? 'Present' : 'Absent'}',
+                  'Yoklama Durumun: ${isPresent ? 'Mevcut' : 'Yok'}',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.black,

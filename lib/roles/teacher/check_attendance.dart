@@ -14,14 +14,14 @@ class TeacherAttendancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TeacherBasePage(
-      title: 'Check Attendance',
+      title: 'Yoklama Kayıtları',
       currentPageIndex: 2,
       buildBody: (context) => StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('subjects').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-              child: Text('Error: ${snapshot.error}'),
+              child: Text('Hata: ${snapshot.error}'),
             );
           }
 
@@ -49,7 +49,7 @@ class TeacherAttendancePage extends StatelessWidget {
                   }
 
                   if (teacherAssociatedSnapshot.hasError) {
-                    return Text('Error: ${teacherAssociatedSnapshot.error}');
+                    return Text('Hata: ${teacherAssociatedSnapshot.error}');
                   }
 
                   final bool isTeacherAssociated =

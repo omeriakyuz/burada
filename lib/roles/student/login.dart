@@ -74,7 +74,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
             IconButton(
               onPressed: _authenticate,
               icon: const Icon(Icons.fingerprint_outlined),
-              iconSize: 300.0, // Adjust size as needed
+              iconSize: 300.0,
               tooltip: 'Biyometrik doğrulama',
               color: secondDark,
             ),

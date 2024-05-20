@@ -19,7 +19,7 @@ class _TeacherSettingsPageState extends State<TeacherSettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text('Ayarlar'),
         backgroundColor: darkest,
         foregroundColor: Colors.white,
         actions: [
@@ -45,11 +45,11 @@ class _TeacherSettingsPageState extends State<TeacherSettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Notifications',
+              'Bildirimler',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SwitchListTile(
-              title: const Text('Receive Notifications'),
+              title: const Text('Bildirimleri Al.'),
               activeColor: secondDark,
               value: notificationSwitchValue,
               onChanged: (value) {
@@ -60,7 +60,7 @@ class _TeacherSettingsPageState extends State<TeacherSettingsPage> {
             ),
             const SizedBox(height: 20),
             const Text(
-              'Volume',
+              'Ses',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Slider(
@@ -95,7 +95,7 @@ class _TeacherSettingsPageState extends State<TeacherSettingsPage> {
                   bottom: 15,
                 ),
               ),
-              child: const Text('Save Settings'),
+              child: const Text('Ayarları Kaydet'),
             ),
           ],
         ),

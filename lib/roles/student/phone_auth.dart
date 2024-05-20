@@ -69,14 +69,11 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
     );
   }
 
-  // Function to create a user document in Firestore
   Future<void> createUserDocument(User user) async {
     try {
-      // Reference to the 'users' collection in Firestore
       CollectionReference users =
           FirebaseFirestore.instance.collection('users');
 
-      // Create a new document with the user's UID
       await users.doc(rollNoController.text).set({
         'rollNo': rollNoController.text,
         'name': nameController.text,
@@ -85,9 +82,9 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
         'present': false
       });
 
-      print('User document created in Firestore successfully.');
+      print('Kullanıcı bilgisi veri tabanına kaydedildi');
     } catch (e) {
-      print('Failed to create user document in Firestore: $e');
+      print('Veri tabanına kayıt esnasında hata oluştu: $e');
     }
   }
 
@@ -134,12 +131,11 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                   controller: rollNoController,
                   onChanged: (value) {
                     rollNumberOfStudent =
-                        value; // Update the global value when text changes
+                        value;
                   },
                   decoration: InputDecoration(
-                    hintText: '077bei001',
+                    hintText: '25251',
                     labelText: 'Öğrenci Numarası',
-                    // labelStyle: TextStyle(color: darkest),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -155,7 +151,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                 child: TextField(
                   controller: nameController,
                   decoration: InputDecoration(
-                    hintText: 'John Doe',
+                    hintText: 'john doe',
                     labelText: 'İsim',
                     // labelStyle: TextStyle(color: darkest),
                     border: OutlineInputBorder(
@@ -227,7 +223,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                   child: TextField(
                     controller: otpController,
                     decoration: InputDecoration(
-                      hintText: 'Doğrulama Kodu',
+                      hintText: '123456',
                       labelText: 'Kod',
                       // labelStyle: TextStyle(color: darkest),
                       border: OutlineInputBorder(
