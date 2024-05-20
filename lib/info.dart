@@ -27,7 +27,8 @@ class InfoPage extends StatelessWidget {
               ),
               SizedBox(height: 16),
               Text(
-                'aciklama TBD',
+                'Burada App, Bluetooth teknolojisiyle yoklama süreçlerini kolaylaştıran bir uygulamadır. Öğrenci ve öğretmenlerin zamandan tasarruf etmesini sağlar.'
+                ,
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -40,7 +41,7 @@ class InfoPage extends StatelessWidget {
                     fontSize: 25, fontWeight: FontWeight.bold, color: darkest),
               ),
               Text(
-                '* TBD',
+                '* lorem ipsum',
                 style: TextStyle(fontSize: 16),
               ),
             ],
