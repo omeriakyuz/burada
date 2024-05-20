@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         '/teacher_checkattendance': (context) => const TeacherAttendancePage(),
         '/teacher_addclass': (context) => const AddClass(),
       },
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       title: 'Burada',
       theme: ThemeData(
         textTheme: GoogleFonts.nunitoTextTheme(),
@@ -163,6 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String serviceUUID = '21122064-63dd-4788-9fb3-424fa29f2148';
     List<int> manufactData = utf8.encode(rollNumber);
     print("ManufacturerData:$manufactData");
+    print("ManufacturerData(decode):" + utf8.decode(manufactData));
     AdvertiseData advertiseData = AdvertiseData(
       serviceUuid: serviceUUID,
       manufacturerId: 0xFFFF,
@@ -179,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
           isAdvertising = true;
         });
       } catch (e) {
-        print('Error starting advertising: $e');
+        print('Advertising esnasında oluşan hata: $e');
       }
     });
   }
@@ -192,30 +193,9 @@ class _MyHomePageState extends State<MyHomePage> {
         advertiseTime?.cancel();
       });
     } catch (e) {
-      print('Error stopping advertising: $e');
+      print('Advertising durdururken oluşan hata: $e');
     }
   }
 
-  Future<String> fetchRollNumber() async {
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      String userUID = currentUser.uid;
-      print("UserID:$userUID");
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userUID)
-          .get();
-      if (userDoc.exists) {
-        rollNumber = userDoc.get('rollNo');
-        print("Roll Number: $rollNumber");
-      } else {
-        rollNumber = "Null";
-        print('User document not found.');
-      }
-    } else {
-      rollNumber = "No user found";
-      print('No current user found.');
-    }
-    return rollNumber;
-  }
+
 }
