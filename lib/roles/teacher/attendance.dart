@@ -88,7 +88,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
                   ],
                   rows: List<DataRow>.generate(
                     users.length,
-                    (index) => DataRow(
+                        (index) => DataRow(
                       cells: <DataCell>[
                         DataCell(
                           Text(users[index]['rollNo']),
@@ -119,7 +119,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
                                     onChanged: (String? newValue) async {
                                       if (newValue != null) {
                                         bool updatedValue =
-                                            newValue == 'P' ? true : false;
+                                        newValue == 'Mevcut' ? true : false;
                                         // Update the Firestore document with the selected value
                                         await firestore
                                             .collection('users')
@@ -137,11 +137,11 @@ class _AttendanceTableState extends State<AttendanceTable> {
                                     items: <String>['Yok', 'Mevcut']
                                         .map<DropdownMenuItem<String>>(
                                             (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
                                   );
                                 },
                               ),
