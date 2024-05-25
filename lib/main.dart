@@ -24,7 +24,6 @@ import 'firebase_options.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ble_peripheral/flutter_ble_peripheral.dart';
-import 'package:uuid/uuid.dart';
 import 'package:burada/animation.dart';
 
 void main() async {
