@@ -113,37 +113,49 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
 
   Future<void> startBLEScan() async {
     List<BluetoothDevice> devices = [];
-    devices.clear(); // Yeni tarama öncesi listeyi temizle
+    devices.clear();
     print('tarama başladı.');
 
-    try {
-      await FlutterBluePlus.startScan(timeout: Duration(seconds: 10));
-    } catch (e) {
-      print('Tarama hatası: $e');
-    }
+    await FlutterBluePlus.startScan(
+      withServices:[Guid("21122064-63dd-4788-9fb3-424fa29f2148")]
+    );
+
 
     FlutterBluePlus.scanResults.listen((results) async {
       final studentsCollection = FirebaseFirestore.instance.collection('students');
 
       for (ScanResult r in results) {
         if (devices.contains(r.device)) {
-          continue; // Bu cihaz zaten işlendi, atla
+          continue; // işlenen cihazı atla
         }
-        devices.add(r.device); // Yeni cihazı listeye ekle
+        devices.add(r.device); // listeyye cihaz ekle (yoksa)
 
         final manufacturerData = r.advertisementData.manufacturerData;
         if (manufacturerData != null && manufacturerData.isNotEmpty) {
-          final studentIdBytes = manufacturerData.values.first;
-          final studentId = utf8.decode(studentIdBytes);
-          print("Cihaz ;) = ${r.device.remoteId}");
-          print("Manufacturer datake = ${r.advertisementData.manufacturerData}");
+          // List<int> asciiCodes = r.advertisementData.manufacturerData.values.first;  manufacturerData = List<int>;
+          final studentId = _extractStudentId(manufacturerData);
 
-
+          try {
+            final studentDoc = await studentsCollection.doc(studentId).get();
+            if (studentDoc.exists) {
+              await studentDoc.reference.update({'present': true});
+              print('Öğrenci ($studentId) yoklamaya alındı!');
+            } else {
+              print('Öğrenci ($studentId) veritabanında bulunamadı.');
+            }
+          } catch (e) {
+            print('Firebase hatası (Öğrenci ID: $studentId): $e');
+          }
         }
       }
     });
+
   }
 
+  String _extractStudentId(Map<int, List<int>> manufacturerData) {
+    final studentIdBytes = manufacturerData.values.first;
+    return utf8.decode(studentIdBytes);
+  }
 
   Future<void> stopBLEScan() async {
     print('tarama durdu.');
