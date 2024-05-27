@@ -85,7 +85,6 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                         
                               if (isClassStarted) {
                                 stopBLEScan();
-                                resultHandling();
                               } else {
                                 startBLEScan();
                               }
@@ -113,39 +112,38 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
   }
 
   Future<void> startBLEScan() async {
+    List<BluetoothDevice> devices = [];
+    devices.clear(); // Yeni tarama öncesi listeyi temizle
     print('tarama başladı.');
-    var subscription = FlutterBluePlus.onScanResults.listen((results) {
-      if (results.isNotEmpty) {
-        ScanResult r = results.last; // the most recently found device
-//        print('${r.device.remoteId}: "${r.advertisementData.manufacturerData}" bulundu!');
-        List<int> codeUnits = [116,101,115,116]; //ascii / utf-8 (temel harfler için aynı)
-        String decodedText = utf8.decode(codeUnits);
 
-        print(decodedText); // Çıktı: 5$,"\x9B±
+    try {
+      await FlutterBluePlus.startScan(timeout: Duration(seconds: 10));
+    } catch (e) {
+      print('Tarama hatası: $e');
+    }
+
+    FlutterBluePlus.scanResults.listen((results) async {
+      final studentsCollection = FirebaseFirestore.instance.collection('students');
+
+      for (ScanResult r in results) {
+        if (devices.contains(r.device)) {
+          continue; // Bu cihaz zaten işlendi, atla
+        }
+        devices.add(r.device); // Yeni cihazı listeye ekle
+
+        final manufacturerData = r.advertisementData.manufacturerData;
+        if (manufacturerData != null && manufacturerData.isNotEmpty) {
+          final studentIdBytes = manufacturerData.values.first;
+          final studentId = utf8.decode(studentIdBytes);
+          print("Cihaz ;) = ${r.device.remoteId}");
+          print("Manufacturer datake = ${r.advertisementData.manufacturerData}");
+
+
+        }
       }
-    },
-      onError: (e) => print(e),
-    );
-
-// cleanup: cancel subscription when scanning stops
-    FlutterBluePlus.cancelWhenScanComplete(subscription);
-
-// Wait for Bluetooth enabled & permission granted
-// In your real app you should use `FlutterBluePlus.adapterState.listen` to handle all states
-    await FlutterBluePlus.adapterState.where((val) => val == BluetoothAdapterState.on).first;
-
-// Start scanning w/ timeout
-// Optional: use `stopScan()` as an alternative to timeout
-    await FlutterBluePlus.startScan(
-        timeout: Duration(seconds:15));
-
-// wait for scanning to stop
-    await FlutterBluePlus.isScanning.where((val) => val == false).first;
+    });
   }
 
-  void resultHandling() {
-
-  }
 
   Future<void> stopBLEScan() async {
     print('tarama durdu.');
