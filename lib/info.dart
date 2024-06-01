@@ -41,7 +41,8 @@ class InfoPage extends StatelessWidget {
                     fontSize: 25, fontWeight: FontWeight.bold, color: darkest),
               ),
               Text(
-                '* lorem ipsum',
+                '''* 1.adım:\n* 2.adım:\n* 3.adım:
+                   ''',
                 style: TextStyle(fontSize: 16),
               ),
             ],
