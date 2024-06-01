@@ -117,12 +117,12 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
     print('tarama başladı.');
 
     await FlutterBluePlus.startScan(
-      withServices:[Guid("21122064-63dd-4788-9fb3-424fa29f2148")]
+      //withServices:[Guid("21122064-63dd-4788-9fb3-424fa29f2148")]
     );
 
 
     FlutterBluePlus.scanResults.listen((results) async {
-      final studentsCollection = FirebaseFirestore.instance.collection('students');
+      final studentsCollection = FirebaseFirestore.instance.collection('users');
 
       for (ScanResult r in results) {
         if (devices.contains(r.device)) {
@@ -131,31 +131,30 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
         devices.add(r.device); // listeyye cihaz ekle (yoksa)
 
         final manufacturerData = r.advertisementData.manufacturerData;
-        if (manufacturerData != null && manufacturerData.isNotEmpty) {
-          // List<int> asciiCodes = r.advertisementData.manufacturerData.values.first;  manufacturerData = List<int>;
-          final studentId = _extractStudentId(manufacturerData);
-
-          try {
-            final studentDoc = await studentsCollection.doc(studentId).get();
-            if (studentDoc.exists) {
-              await studentDoc.reference.update({'present': true});
-              print('Öğrenci ($studentId) yoklamaya alındı!');
-            } else {
-              print('Öğrenci ($studentId) veritabanında bulunamadı.');
+        if (manufacturerData != null && manufacturerData.isNotEmpty ) {
+          r.advertisementData.manufacturerData.forEach((manufacturerId, listData) async {  // manufacturer data ( öğrenci ID'sini bluetooth formatından stringe çevir
+            if (manufacturerId == 65535) {      // manufacturerId (company id) 0xFFFF olanları işleme al (uygulamamızdaki bluetooth bağlantısında kullanılan)
+              var manufacturerDataString = String.fromCharCodes(listData);
+              print('listData: $manufacturerDataString');
+              try {
+                final studentDoc = await studentsCollection.doc(manufacturerDataString).get();
+                if (studentDoc.exists) {
+                  await studentDoc.reference.update({'present': true});    // Öğrenci ID'si alınan öğrencinin present durumunu true olarak değiştir.
+                  print('Öğrenci ($manufacturerDataString) yoklamaya alındı!');
+                } else {
+                  print('Öğrenci ($manufacturerDataString) veritabanında bulunamadı.');
+                }
+              } catch (e) {
+                print('Firebase hatası (Öğrenci ID: $manufacturerDataString): $e');
+              }
             }
-          } catch (e) {
-            print('Firebase hatası (Öğrenci ID: $studentId): $e');
-          }
+          });
         }
       }
     });
 
   }
 
-  String _extractStudentId(Map<int, List<int>> manufacturerData) {
-    final studentIdBytes = manufacturerData.values.first;
-    return utf8.decode(studentIdBytes);
-  }
 
   Future<void> stopBLEScan() async {
     print('tarama durdu.');
