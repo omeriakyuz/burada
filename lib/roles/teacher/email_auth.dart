@@ -75,6 +75,12 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
         appBar: AppBar(
           backgroundColor: darkest,
           foregroundColor: Colors.white,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           actions: [
             IconButton(
                 icon: const Icon(
