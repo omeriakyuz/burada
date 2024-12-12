@@ -26,6 +26,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ble_peripheral/flutter_ble_peripheral.dart';
 import 'package:burada/animation.dart';
 
+import 'package:burada/face_verification.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -86,6 +88,17 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  Future<void> _startFaceVerification() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => FaceVerificationPage(rollNumber: rollNumber)),
+    );
+    if (result == true) {
+      startAdvertising();
+    } else {
+      print('Yüz doğrulama başarısız');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,9 +128,22 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                'ÖĞRENCİ NUMARAN: \n $rollNumber',
+                'Öğrenci Numaran: \n $rollNumber',
                 style: const TextStyle(
-                    fontSize: 30, color: darkest, fontWeight: FontWeight.w600),
+                    fontSize: 24, color: darkest, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Yoklamaya katılmak için önce yüzünü doğrulaman gerekiyor.',
+                style: const TextStyle(
+                    fontSize: 18, color: Colors.black, fontWeight: FontWeight.w400),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                'Butona tıklayıp yüzünü doğruladıktan sonra yoklamaya katılabilirsin.',
+                style: const TextStyle(
+                    fontSize: 18, color: Colors.black, fontWeight: FontWeight.w400),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 50),
@@ -126,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   if (isAdvertising) {
                     stopAdvertising();
                   } else {
-                    startAdvertising();
+                    _startFaceVerification();
                   }
                 },
                 style: ElevatedButton.styleFrom(
