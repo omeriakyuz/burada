@@ -1,12 +1,15 @@
 import 'package:burada/roles/student/check_attendance.dart';
 import 'package:burada/roles/student/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:burada/colors.dart';
 import 'package:burada/info.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:burada/roles/student/settings.dart';
 import 'package:burada/animation.dart';
+
+import '../../initialPage.dart';
 
 class StudentBasePage extends StatelessWidget {
   final String title;
@@ -134,6 +137,15 @@ class StudentBasePage extends StatelessWidget {
                   PageTransitionAnimation(
                     page: InfoPage(),
                   ),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Çıkış Yap'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => ChooseRolePage()),
                 );
               },
             ),
