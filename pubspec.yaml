@@ -32,7 +32,6 @@ dependencies:
     sdk: flutter
   google_fonts: ^6.2.0
   flutter_ble_peripheral: ^1.2.3
-  uuid: ^4.3.3
   crypto: ^3.0.3
   hex: ^0.2.0
   local_auth: ^2.2.0
@@ -46,6 +45,13 @@ dependencies:
   http: ^1.2.0
   cupertino_icons: ^1.0.6
   flutter_blue_plus: ^1.32.7
+  camera: ^0.11.0+2
+  path: ^1.9.0
+  path_provider: ^2.1.5
+  image: ^4.3.0
+  firebase_storage: ^11.7.7
+  permission_handler: ^11.3.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
