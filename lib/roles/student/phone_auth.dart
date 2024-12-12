@@ -31,6 +31,16 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
   var otpFieldVisibility = false;
   var receivedID = '';
 
+  //TODO: bu kısım silinecek
+  @override
+    void initState() {
+    super.initState();
+    rollNoController.text = '211220064';
+    nameController.text = 'Ömer İnanç Akyüz';
+    semesterController.text = 'III/II';
+    phoneController.text = '5356095315';
+  }
+
   void verifyUserPhoneNumber() {
     auth.verifyPhoneNumber(
       phoneNumber: userNumber,
@@ -79,7 +89,8 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
         'name': nameController.text,
         'semester': semesterController.text,
         'phoneNo': phoneController.text,
-        'present': false
+        'present': false,
+        'profilePicture': 'https://firebasestorage.googleapis.com/v0/b/burada-app-v3.firebasestorage.app/o/profile_pictures%2F211220064.jpg?alt=media',
       });
 
       print('Kullanıcı bilgisi veri tabanına kaydedildi');
@@ -100,7 +111,12 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
         appBar: AppBar(
           backgroundColor: darkest,
           foregroundColor: Colors.white,
-          actions: [
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),          actions: [
             IconButton(
                 icon: const Icon(
                   Icons.info_outlined,
@@ -134,7 +150,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                         value;
                   },
                   decoration: InputDecoration(
-                    hintText: '25251',
+                    hintText: '211220064',
                     labelText: 'Öğrenci Numarası',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -151,7 +167,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                 child: TextField(
                   controller: nameController,
                   decoration: InputDecoration(
-                    hintText: 'john doe',
+                    hintText: 'Ömer İnanç Akyüz',
                     labelText: 'İsim',
                     // labelStyle: TextStyle(color: darkest),
                     border: OutlineInputBorder(
