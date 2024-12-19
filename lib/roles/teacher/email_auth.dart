@@ -19,19 +19,18 @@ class TeacherEmailAuth extends StatefulWidget {
 class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
   FirebaseAuth auth = FirebaseAuth.instance;
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> signInWithEmailAndPassword() async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-              email: emailController.text, password: passwordController.text);
-      createUserDocument(userCredential.user!);
+          email: emailController.text, password: passwordController.text);
+      await fetchTeacherDocument(userCredential.user!.email!);
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const TeacherHomePage()),
-        (route) => false,
+            (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -42,24 +41,20 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
     }
   }
 
-  // Function to create a user document in Firestore
-  Future<void> createUserDocument(User teacher) async {
+  Future<void> fetchTeacherDocument(String email) async {
     try {
-      // Reference to the 'users' collection in Firestore
-      CollectionReference teachers =
-          FirebaseFirestore.instance.collection('teachers');
+      CollectionReference teachers = FirebaseFirestore.instance.collection('teachers');
+      QuerySnapshot querySnapshot = await teachers.where('email', isEqualTo: email).get();
 
-      // Create a new document with the user's UID
-      await teachers.doc(teacher.uid).set(
-        {
-          'email': emailController.text,
-          'name': nameController.text,
-        },
-      );
-
-      print('User document created in Firestore successfully.');
+      if (querySnapshot.docs.isNotEmpty) {
+        var teacherData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        currentTeacher = teacherData['name'];
+        print('Öğretmen bilgisi alındı: $teacherData');
+      } else {
+        print('Öğretmen bulunamadı');
+      }
     } catch (e) {
-      print('Failed to create user document in Firestore: $e');
+      print('Veri tabanından bilgi alırken hata oluştu: $e');
     }
   }
 
@@ -115,23 +110,6 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
                   decoration: InputDecoration(
                     hintText: 'E-Posta',
                     labelText: 'E-Posta',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: TextField(
-                  controller: nameController,
-                  onChanged: (value) {
-                    currentTeacher =
-                        value; // Update the global value when text changes
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'İsim',
-                    labelText: 'İsim',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),

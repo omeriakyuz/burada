@@ -10,6 +10,7 @@ import 'package:burada/roles/student/login.dart';
 import 'package:burada/roles/student/home.dart';
 import 'package:burada/info.dart';
 import 'package:burada/animation.dart';
+import 'package:flutter/services.dart';
 
 String rollNumberOfStudent = '';
 
@@ -24,22 +25,9 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
   FirebaseAuth auth = FirebaseAuth.instance;
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
-  final TextEditingController rollNoController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController semesterController = TextEditingController();
   String userNumber = '';
   var otpFieldVisibility = false;
   var receivedID = '';
-
-  //TODO: bu kısım silinecek
-  @override
-    void initState() {
-    super.initState();
-    rollNoController.text = '211220064';
-    nameController.text = 'Ömer İnanç Akyüz';
-    semesterController.text = 'III/II';
-    phoneController.text = '5356095315';
-  }
 
   void verifyUserPhoneNumber() {
     auth.verifyPhoneNumber(
@@ -69,33 +57,30 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
       verificationId: receivedID,
       smsCode: otpController.text,
     );
-    await auth
-        .signInWithCredential(credential)
-        .then((value) => createUserDocument(value.user!));
+    await auth.signInWithCredential(credential).then((value) async {
+      await fetchUserDocument(value.user!.phoneNumber!);
+    });
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const StudentLoginPage()),
-          (route) => false,
+      MaterialPageRoute(builder: (context) => const StudentHomePage()),
+      (route) => false,
     );
   }
 
-  Future<void> createUserDocument(User user) async {
+  Future<void> fetchUserDocument(String phoneNumber) async {
     try {
-      CollectionReference users =
-          FirebaseFirestore.instance.collection('users');
+      CollectionReference users = FirebaseFirestore.instance.collection('users');
+      QuerySnapshot querySnapshot = await users.where('phoneNo', isEqualTo: phoneNumber).get();
 
-      await users.doc(rollNoController.text).set({
-        'rollNo': rollNoController.text,
-        'name': nameController.text,
-        'semester': semesterController.text,
-        'phoneNo': phoneController.text,
-        'present': false,
-        'profilePicture': 'https://firebasestorage.googleapis.com/v0/b/burada-app-v3.firebasestorage.app/o/profile_pictures%2F211220064.jpg?alt=media',
-      });
-
-      print('Kullanıcı bilgisi veri tabanına kaydedildi');
+      if (querySnapshot.docs.isNotEmpty) {
+        var userData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        rollNumberOfStudent = userData['rollNo'];
+        print('Kullanıcı bilgisi alındı: $userData');
+      } else {
+        print('Kullanıcı bulunamadı');
+      }
     } catch (e) {
-      print('Veri tabanına kayıt esnasında hata oluştu: $e');
+      print('Veri tabanından bilgi alırken hata oluştu: $e');
     }
   }
 
@@ -116,7 +101,8 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
             onPressed: () {
               Navigator.pop(context);
             },
-          ),          actions: [
+          ),
+          actions: [
             IconButton(
                 icon: const Icon(
                   Icons.info_outlined,
@@ -132,7 +118,7 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                 })
           ],
           title: const Text(
-            'Doğrulama',
+            'Öğrenci Girişi',
           ),
           centerTitle: true,
         ),
@@ -140,95 +126,33 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 100),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: TextField(
-                  controller: rollNoController,
-                  onChanged: (value) {
-                    rollNumberOfStudent =
-                        value;
-                  },
-                  decoration: InputDecoration(
-                    hintText: '211220064',
-                    labelText: 'Öğrenci Numarası',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    //  focusedBorder: OutlineInputBorder(
-                    //   borderRadius: BorderRadius.circular(15),
-                    //   borderSide: BorderSide(color: darkest),
-                    // )
-                  ),
-                ),
+              SizedBox(
+                height: 100,
+              ),
+              const Text(
+                'Sisteme kayıtlı telefon numaranızı kullanarak giriş yapabilirsiniz.',
+                style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
               ),
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    hintText: 'Ömer İnanç Akyüz',
-                    labelText: 'İsim',
-                    // labelStyle: TextStyle(color: darkest),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    //  focusedBorder: OutlineInputBorder(
-                    //   borderRadius: BorderRadius.circular(15),
-                    //   borderSide: BorderSide(color: darkest),
-                    // )
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: TextField(
-                  controller: semesterController,
-                  decoration: InputDecoration(
-                    hintText: 'III/II',
-                    labelText: 'Dönem',
-                    // labelStyle: TextStyle(color: darkest),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    //  focusedBorder: OutlineInputBorder(
-                    //   borderRadius: BorderRadius.circular(15),
-                    //   borderSide: BorderSide(color: darkest),
-                    // )
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: IntlPhoneField(
-                  showDropdownIcon: false,
                   controller: phoneController,
-                  countries: const [
-                    Country(
-                      name: "Türkiye",
-                      nameTranslations: {},
-                      flag: "🇹🇷",
-                      code: "TR",
-                      dialCode: "90",
-                      minLength: 10,
-                      maxLength: 10,
-                    )
-                  ], // Restrict to Nepal
                   decoration: InputDecoration(
-                    hintText: 'xxxxxxxxxx',
+                    prefixText: '+90 ',
+                    hintText: 'XXXXXXXXXX',
                     labelText: 'Telefon Numarası',
-                    // labelStyle: TextStyle(color: darkest),
                     border: OutlineInputBorder(
-                      // borderSide: BorderSide(color: darkest),
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    // focusedBorder: OutlineInputBorder(
-                    //   borderRadius: BorderRadius.circular(15),
-                    //   borderSide: BorderSide(color: darkest),
-                    // )
                   ),
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(10),
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  keyboardType: TextInputType.phone,
                   onChanged: (val) {
-                    userNumber = val.completeNumber;
+                    userNumber = '+90' + val;
                   },
                 ),
               ),
@@ -239,17 +163,11 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                   child: TextField(
                     controller: otpController,
                     decoration: InputDecoration(
-                      hintText: '123456',
-                      labelText: 'Kod',
-                      // labelStyle: TextStyle(color: darkest),
+                      hintText: '111111',
+                      labelText: 'SMS Kodu',
                       border: OutlineInputBorder(
-                        borderSide: const BorderSide(color: darkest),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      //    focusedBorder: OutlineInputBorder(
-                      //   borderRadius: BorderRadius.circular(15),
-                      //   borderSide: BorderSide(color: darkest),
-                      // )
                     ),
                   ),
                 ),
