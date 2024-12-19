@@ -24,6 +24,16 @@ class TeacherBasePage extends StatelessWidget {
     required this.currentPageIndex,
   }) : super(key: key);
 
+  Future<Map<String, dynamic>> fetchTeacherInfo() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    print('User UID: ${user!.uid}');
+    if (user != null) {
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('teachers').doc(user.uid).get();
+      return doc.data() as Map<String, dynamic>;
+    }
+    return {};
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,21 +41,6 @@ class TeacherBasePage extends StatelessWidget {
         title: Text(title),
         backgroundColor: darkest,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-              icon: Icon(
-                Icons.info_outlined,
-                color: lightest,
-                size: 30,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  PageTransitionAnimation(
-                    page: InfoPage(),
-                  ),
-                );
-              })
-        ],
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(
@@ -65,7 +60,6 @@ class TeacherBasePage extends StatelessWidget {
         child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
             child: GNav(
-              // tabMargin: EdgeInsets.all(1),
               iconSize: 30,
               textSize: 20,
               backgroundColor: darkest,
@@ -114,56 +108,68 @@ class TeacherBasePage extends StatelessWidget {
               selectedIndex: currentPageIndex,
             )),
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            Container(
-              height: 100,
-              child: const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: darkest,
-                ),
-                padding: EdgeInsets.all(20),
-                child: Text(
-                  'Menü',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
+      drawer: FutureBuilder<Map<String, dynamic>>(
+        future: fetchTeacherInfo(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Drawer(
+              child: Center(child: CircularProgressIndicator()),
+            );
+          } else if (snapshot.hasError) {
+            return Drawer(
+              child: Center(child: Text('Hata: ${snapshot.error}')),
+            );
+          } else {
+            var teacherInfo = snapshot.data!;
+            return Drawer(
+              child: ListView(
+                children: [
+                  UserAccountsDrawerHeader(
+                    accountName: Text(teacherInfo['name']),
+                    accountEmail: Text(teacherInfo['email']),
+                    currentAccountPicture: CircleAvatar(
+                      backgroundImage: teacherInfo['profilePicture'].isNotEmpty
+                          ? NetworkImage(teacherInfo['profilePicture'])
+                          : AssetImage('assets/images/blank-profile.png') as ImageProvider,
+                    ),
+                    decoration: BoxDecoration(
+                      color: darkest,
+                    ),
                   ),
-                ),
+                  ListTile(
+                    title: const Text('Ayarlar'),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageTransitionAnimation(
+                          page: TeacherSettingsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('Hakkında'),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageTransitionAnimation(
+                          page: InfoPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('Çıkış Yap'),
+                    onTap: () async {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => ChooseRolePage()),
+                      );
+                    },
+                  ),
+                ],
               ),
-            ),
-            ListTile(
-              title: const Text('Ayarlar'),
-              onTap: () {
-                Navigator.of(context).push(
-                  PageTransitionAnimation(
-                    page: TeacherSettingsPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Hakkında'),
-              onTap: () {
-                Navigator.of(context).push(
-                  PageTransitionAnimation(
-                    page: InfoPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Çıkış Yap'),
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => ChooseRolePage()),
-                );
-              },
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
     );
   }
