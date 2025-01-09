@@ -1,109 +1,222 @@
-import 'package:burada/roles/teacher/attendance.dart';
-import 'package:burada/roles/teacher/email_auth.dart';
 import 'package:burada/roles/teacher/teacher_base.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:burada/colors.dart';
-import 'package:burada/roles/teacher/home.dart';
 import 'package:burada/info.dart';
-import 'package:burada/animation.dart';
+import 'package:intl/intl.dart';
 
-class TeacherAttendancePage extends StatelessWidget {
-  const TeacherAttendancePage({Key? key});
+import 'email_auth.dart';
+
+class TeacherAttendancePage extends StatefulWidget {
+  const TeacherAttendancePage({Key? key}) : super(key: key);
+
+  @override
+  _TeacherAttendancePageState createState() => _TeacherAttendancePageState();
+}
+
+class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
+  String? selectedSubject;
+  List<String> teacherSubjects = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadTeacherSubjects();
+  }
+
+  Future<void> loadTeacherSubjects() async {
+    final QuerySnapshot subjectsSnapshot = await FirebaseFirestore.instance
+        .collection('subjects')
+        .where('teacherName', isEqualTo: currentTeacher)
+        .get();
+
+    setState(() {
+      teacherSubjects = subjectsSnapshot.docs
+          .map((doc) => doc['subject'] as String)
+          .toList();
+      if (teacherSubjects.isNotEmpty) {
+        selectedSubject = teacherSubjects.first;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return TeacherBasePage(
       title: 'Yoklama Kayıtları',
       currentPageIndex: 2,
-      buildBody: (context) => StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('subjects').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Hata: ${snapshot.error}'),
-            );
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          final List<DocumentSnapshot> documents = snapshot.data!.docs;
-
-          return ListView.builder(
-            itemCount: documents.length,
-            itemBuilder: (context, index) {
-              final Map<String, dynamic> data =
-                  documents[index].data() as Map<String, dynamic>;
-              final String subjectName = data['subject'];
-              final String teacherName = data['teacherName'];
-              return FutureBuilder<bool>(
-                future: isTeacherAssociatedWithSubject(teacherName),
-                builder: (context, teacherAssociatedSnapshot) {
-                  if (teacherAssociatedSnapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const CircularProgressIndicator(color: Colors.white);
+      buildBody: (context) => Column(
+        children: [
+          if (teacherSubjects.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: lightest,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: DropdownButton<String>(
+                  value: selectedSubject,
+                  isExpanded: true,
+                  dropdownColor: lightest,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                  items: teacherSubjects.map((String subject) {
+                    return DropdownMenuItem<String>(
+                      value: subject,
+                      child: Text(subject),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedSubject = newValue;
+                    });
+                  },
+                ),
+              ),
+            ),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('attendanceRecords')
+                    .where('subjectName', isEqualTo: selectedSubject)
+                    .orderBy('date', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
                   }
 
-                  if (teacherAssociatedSnapshot.hasError) {
-                    return Text('Hata: ${teacherAssociatedSnapshot.error}');
-                  }
-
-                  final bool isTeacherAssociated =
-                      teacherAssociatedSnapshot.data ?? false;
-
-                  if (isTeacherAssociated) {
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                        top: 8,
-                        bottom: 8,
-                        right: 10,
-                        left: 10,
-                      ),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        elevation: 3,
-                        color: lightest,
-                        child: ListTile(
-                          title: Text(
-                            subjectName,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          trailing: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                PageTransitionAnimation(
-                                  page: AttendanceTable(),
-                                ),
-                              ); // Handle onTap
-                            },
-                            child: const Icon(Icons.edit, color: Colors.black),
-                          ),
-                        ),
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Hata: ${snapshot.error}',
+                        style: TextStyle(color: Colors.white),
                       ),
                     );
-                  } else {
-                    return const SizedBox(); // Return an empty container if the teacher is not associated with the subject
                   }
-                },
-              );
-            },
-          );
-        },
-      ),
-    ); //Base Page
-  }
 
-  Future<bool> isTeacherAssociatedWithSubject(String teacherName) async {
-    return teacherName == currentTeacher;
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Bu ders için yoklama kaydı bulunmamaktadır.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      final record = snapshot.data!.docs[index];
+                      final data = record.data() as Map<String, dynamic>;
+                      final studentList = Map<String, bool>.from(data['studentList'] as Map);
+                      final date = data['date'] as String;
+                      
+                      // Katılan ve katılmayan öğrenci sayılarını hesapla
+                      int presentCount = studentList.values.where((present) => present).length;
+                      int totalCount = studentList.length;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          color: lightest,
+                          elevation: 4,
+                          child: ExpansionTile(
+                            title: Text(
+                              date,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Katılım: $presentCount/$totalCount',
+                              style: TextStyle(
+                                color: Colors.black87,
+                              ),
+                            ),
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Öğrenci Listesi:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    ...studentList.entries.map((entry) {
+                                      return FutureBuilder<DocumentSnapshot>(
+                                        future: FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc(entry.key)
+                                            .get(),
+                                        builder: (context, studentSnapshot) {
+                                          if (!studentSnapshot.hasData) {
+                                            return SizedBox.shrink();
+                                          }
+
+                                          final studentData = studentSnapshot.data!.data() as Map<String, dynamic>;
+                                          final studentName = studentData['name'] as String;
+
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  entry.value ? Icons.check_circle : Icons.cancel,
+                                                  color: entry.value ? Colors.green : Colors.red,
+                                                  size: 20,
+                                                ),
+                                                SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    '$studentName (${entry.key})',
+                                                    style: TextStyle(
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ] else
+            Center(
+              child: Text(
+                'Henüz ders atamanız bulunmamaktadır.',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
