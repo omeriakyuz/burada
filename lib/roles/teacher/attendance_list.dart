@@ -18,6 +18,7 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
   late AnimationController _controller;
   late Animation<double> _animation;
   bool _isClassStarted = false;
+  Map<String, bool> attendanceMap = {};
 
   @override
   void initState() {
@@ -43,12 +44,24 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
     devices.clear();
     print('tarama başladı.');
 
+    // Dersin öğrenci listesini al
+    final subjectDoc = await FirebaseFirestore.instance.collection('subjects').doc(widget.subjectName).get();
+    if (!subjectDoc.exists) {
+      print('Ders bulunamadı.');
+      return;
+    }
+
+    // Öğrenci listesini array'den al ve attendance map'i oluştur
+    List<String> studentList = List<String>.from(subjectDoc.data()!['studentList'] as List);
+    attendanceMap.clear();
+    for (String studentId in studentList) {
+      attendanceMap[studentId] = false;
+    }
+
     await FlutterBluePlus.startScan();
 
     FlutterBluePlus.scanResults.listen((results) async {
       final studentsCollection = FirebaseFirestore.instance.collection('users');
-      final subjectDocRef = FirebaseFirestore.instance.collection('subjects').doc(widget.subjectName);
-
 
       for (ScanResult r in results) {
         if (devices.contains(r.device)) {
@@ -63,16 +76,13 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
               var manufacturerDataString = String.fromCharCodes(listData);
               print('listData: $manufacturerDataString');
               try {
-
-                final studentDoc = await studentsCollection.doc(manufacturerDataString).get();
-                if (studentDoc.exists) {
-                  await studentDoc.reference.update({'present': true});
-                  await subjectDocRef.update({
-                    'studentList.$manufacturerDataString': true,
-                  });
+                // Öğrenci ID'si ders listesinde var mı kontrol et
+                if (studentList.contains(manufacturerDataString)) {
+                  attendanceMap[manufacturerDataString] = true;
+                  setState(() {});
                   print('Öğrenci ($manufacturerDataString) yoklamaya alındı!');
                 } else {
-                  print('Öğrenci ($manufacturerDataString) veritabanında bulunamadı.');
+                  print('Öğrenci ($manufacturerDataString) bu dersin listesinde değil.');
                 }
               } catch (e) {
                 print('Firebase hatası (Öğrenci ID: $manufacturerDataString): $e');
@@ -105,11 +115,20 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
               ),
               TextButton(
                 child: Text('Evet'),
-                onPressed: () {
+                onPressed: () async {
                   setState(() {
                     _isClassStarted = false;
                   });
                   stopBLEScan();
+
+                  // Yoklama kaydını oluştur
+                  String date = DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now());
+                  await FirebaseFirestore.instance.collection('attendanceRecords').add({
+                    'date': date,
+                    'subjectName': widget.subjectName,
+                    'studentList': attendanceMap,
+                  });
+
                   Navigator.of(context).pop();
                   Navigator.push(
                     context,
@@ -136,6 +155,40 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
     return Scaffold(
       appBar: AppBar(
         title: Text('Yoklama Listesi'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            if (_isClassStarted) {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Yoklamayı İptal Et'),
+                    content: Text('Şuan çıkmak yoklamayı iptal edecektir. Çıkmak istediğinize emin misiniz?'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('Hayır'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      TextButton(
+                        child: Text('Evet'),
+                        onPressed: () {
+                          stopBLEScan();
+                          Navigator.of(context).pop(); // Dialog'u kapat
+                          Navigator.of(context).pop(); // Sayfadan çık
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,13 +219,12 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
                   return Center(child: Text('Belge bulunamadı.'));
                 }
 
-                var studentList = Map<String, bool>.from(snapshot.data!['studentList'] as Map);
+                List<String> studentList = List<String>.from(snapshot.data!['studentList'] as List);
 
                 return ListView.builder(
                   itemCount: studentList.length,
                   itemBuilder: (context, index) {
-                    String studentId = studentList.keys.elementAt(index);
-                    bool isPresent = studentList[studentId] ?? false;
+                    String studentId = studentList[index];
 
                     return FutureBuilder<DocumentSnapshot>(
                       future: FirebaseFirestore.instance.collection('users').doc(studentId).get(),
@@ -212,8 +264,16 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
                             ),
                             subtitle: Text(studentId),
                             trailing: Icon(
-                              isPresent ? Icons.check_circle : Icons.cancel,
-                              color: isPresent ? Colors.green : Colors.red,
+                              attendanceMap[studentId] == true
+                                  ? Icons.check_circle
+                                  : _isClassStarted
+                                  ? Icons.pending
+                                  : Icons.cancel,
+                              color: attendanceMap[studentId] == true
+                                  ? Colors.green
+                                  : _isClassStarted
+                                  ? Colors.grey
+                                  : Colors.red,
                               size: 30,
                             ),
                           ),
@@ -226,7 +286,7 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
             ),
           ),
           Center(
-            child: AnimatedBuilder(
+            child: _isClassStarted ? AnimatedBuilder(
               animation: _animation,
               builder: (context, child) {
                 return Opacity(
@@ -237,7 +297,7 @@ class _AttendancePageState extends State<AttendancePage> with SingleTickerProvid
                   ),
                 );
               },
-            ),
+            ) : SizedBox(),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
