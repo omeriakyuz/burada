@@ -10,7 +10,9 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:burada/roles/student/settings.dart';
 import 'package:burada/animation.dart';
 
+
 import '../../initialPage.dart';
+
 
 class StudentBasePage extends StatelessWidget {
   final String title;
@@ -69,33 +71,42 @@ class StudentBasePage extends StatelessWidget {
               activeColor: Colors.white,
               tabBackgroundColor: middle,
               gap: 10,
+              selectedIndex: currentPageIndex,
+              onTabChange: (index) {
+                if (index == currentPageIndex) return;
+                
+                if (index == 0) {
+                  Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) => StudentHomePage(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                } else if (index == 1) {
+                  Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) => StudentAttendancePage(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                }
+              },
               tabs: [
                 GButton(
                   icon: Icons.home,
                   text: 'Anasayfa',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransitionAnimation(
-                        page: StudentHomePage(),
-                      ),
-                    );
-                  },
                   padding: EdgeInsets.all(10),
                 ),
                 GButton(
                   icon: Icons.assignment,
                   text: 'Yoklama',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransitionAnimation(
-                        page: StudentAttendancePage(),
-                      ),
-                    );
-                  },
                   padding: EdgeInsets.all(10),
                 ),
               ],
-              selectedIndex: currentPageIndex,
             )),
       ),
       drawer: FutureBuilder<Map<String, dynamic>>(

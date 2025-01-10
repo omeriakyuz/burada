@@ -1,4 +1,3 @@
-import 'package:burada/roles/teacher/addclass.dart';
 import 'package:burada/roles/teacher/check_attendance.dart';
 import 'package:burada/roles/teacher/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -67,45 +66,42 @@ class TeacherBasePage extends StatelessWidget {
               activeColor: Colors.white,
               tabBackgroundColor: middle,
               gap: 10,
+              selectedIndex: currentPageIndex,
+              onTabChange: (index) {
+                if (index == currentPageIndex) return;
+                
+                if (index == 0) {
+                  Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) => TeacherHomePage(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                } else if (index == 1) {
+                  Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) => TeacherAttendancePage(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                }
+              },
               tabs: [
                 GButton(
                   icon: Icons.home,
                   text: 'Anasayfa',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransitionAnimation(
-                        page: TeacherHomePage(),
-                      ),
-                    );
-                  },
-                  padding: EdgeInsets.all(10),
-                ),
-                GButton(
-                  icon: Icons.add_circle_outline_outlined,
-                  text: 'Sınıf Ekle',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransitionAnimation(
-                        page: AddClass(),
-                      ),
-                    );
-                  },
                   padding: EdgeInsets.all(10),
                 ),
                 GButton(
                   icon: Icons.assignment,
                   text: 'Yoklama',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransitionAnimation(
-                        page: TeacherAttendancePage(),
-                      ),
-                    );
-                  },
                   padding: EdgeInsets.all(10),
                 ),
               ],
-              selectedIndex: currentPageIndex,
             )),
       ),
       drawer: FutureBuilder<Map<String, dynamic>>(
@@ -137,6 +133,7 @@ class TeacherBasePage extends StatelessWidget {
                     ),
                   ),
                   ListTile(
+                    leading: const Icon(Icons.settings),
                     title: const Text('Ayarlar'),
                     onTap: () {
                       Navigator.of(context).push(
@@ -147,6 +144,7 @@ class TeacherBasePage extends StatelessWidget {
                     },
                   ),
                   ListTile(
+                    leading: const Icon(Icons.info),
                     title: const Text('Hakkında'),
                     onTap: () {
                       Navigator.of(context).push(
@@ -157,6 +155,7 @@ class TeacherBasePage extends StatelessWidget {
                     },
                   ),
                   ListTile(
+                    leading: const Icon(Icons.logout),
                     title: const Text('Çıkış Yap'),
                     onTap: () async {
                       await FirebaseAuth.instance.signOut();
