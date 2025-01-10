@@ -1,9 +1,11 @@
-import 'package:burada/roles/student/phone_auth.dart';
 import 'package:burada/roles/student/student_base.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:burada/colors.dart';
 import 'package:burada/info.dart';
+import 'package:intl/intl.dart';
+import 'package:burada/roles/student/phone_auth.dart';
+
 
 class StudentAttendancePage extends StatefulWidget {
   const StudentAttendancePage({super.key});
@@ -13,145 +15,172 @@ class StudentAttendancePage extends StatefulWidget {
 }
 
 class _StudentAttendancePageState extends State<StudentAttendancePage> {
-  int _currentPageIndex =
-      1;
-  List<bool> isExpandedList = List<bool>.generate(10, (index) => false);
+  int _currentPageIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     return StudentBasePage(
-      title: 'Yoklama',
+      title: 'Yoklama Kayıtları',
       currentPageIndex: _currentPageIndex,
-      buildBody: (context) => FutureBuilder(
-        future: getSubjectsForCurrentSemester(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator(
-              color: Colors.white,
+      buildBody: (context) => StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('subjects')
+            .where('studentList', arrayContains: rollNumberOfStudent)
+            .snapshots(),
+        builder: (context, subjectsSnapshot) {
+          if (subjectsSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
             );
           }
-          if (snapshot.hasError) {
-            return Text('Hata: ${snapshot.error}');
+
+          if (subjectsSnapshot.hasError) {
+            return Center(
+              child: Text(
+                'Hata: ${subjectsSnapshot.error}',
+                style: TextStyle(color: Colors.white),
+              ),
+            );
           }
-          final subjects = snapshot.data!.docs;
+
+          if (!subjectsSnapshot.hasData || subjectsSnapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text(
+                'Henüz kayıtlı olduğunuz ders bulunmamaktadır.',
+                style: TextStyle(color: Colors.white),
+              ),
+            );
+          }
+
           return ListView.builder(
-            itemCount: subjects.length,
+            itemCount: subjectsSnapshot.data!.docs.length,
             itemBuilder: (context, index) {
-              String subjectName = subjects[index]['subject'];
+              final subject = subjectsSnapshot.data!.docs[index];
+              final subjectName = subject['subject'] as String;
+
               return Padding(
-                padding: const EdgeInsets.only(
-                  top: 8,
-                  bottom: 8,
-                  right: 10,
-                  left: 10,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  color: lightest,
+                  elevation: 4,
+                  child: ExpansionTile(
+                    title: Text(
+                      subjectName,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    subtitle: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('attendanceRecords')
+                          .where('subjectName', isEqualTo: subjectName)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Text(
+                            'Yükleniyor...',
+                            style: TextStyle(color: Colors.black54),
+                          );
+                        }
+
+                        int totalClasses = snapshot.data!.docs.length;
+                        int attendedClasses = 0;
+
+                        for (var doc in snapshot.data!.docs) {
+                          final data = doc.data() as Map<String, dynamic>;
+                          final studentList = Map<String, bool>.from(data['studentList'] as Map);
+                          if (studentList[rollNumberOfStudent] == true) {
+                            attendedClasses++;
+                          }
+                        }
+
+                        return Text(
+                          'Katılım: $attendedClasses/$totalClasses',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 14,
+                          ),
+                        );
+                      },
+                    ),
+                    children: [
+                      StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('attendanceRecords')
+                            .where('subjectName', isEqualTo: subjectName)
+                            .orderBy('date', descending: true)
+                            .snapshots(),
+                        builder: (context, recordsSnapshot) {
+                          if (recordsSnapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+
+                          if (!recordsSnapshot.hasData || recordsSnapshot.data!.docs.isEmpty) {
+                            return Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                'Bu ders için yoklama kaydı bulunmamaktadır.',
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            );
+                          }
+
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: recordsSnapshot.data!.docs.length,
+                            itemBuilder: (context, recordIndex) {
+                              final record = recordsSnapshot.data!.docs[recordIndex];
+                              final data = record.data() as Map<String, dynamic>;
+                              final date = data['date'] as String;
+                              final studentList = Map<String, bool>.from(data['studentList'] as Map);
+                              final isPresent = studentList[rollNumberOfStudent] ?? false;
+
+                              return ListTile(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                                title: Text(
+                                  date,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                trailing: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isPresent ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    isPresent ? 'Katıldı' : 'Katılmadı',
+                                    style: TextStyle(
+                                      color: isPresent ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                child: SubjectCard(subjectName: subjectName),
               );
             },
           );
         },
-      ),
-    );
-  }
-
-  Future<QuerySnapshot> getSubjectsForCurrentSemester() async {
-    // Firestore'dan dönem bilgisi çek
-    String currentUserSemester =
-        'III/II'; // Değiştirilecek
-
-    // Güncel kullanıcının dönem sorgusu
-    return FirebaseFirestore.instance
-        .collection('subjects')
-        .where('semester', isEqualTo: currentUserSemester)
-        .get();
-  }
-}
-
-class SubjectCard extends StatefulWidget {
-  final String subjectName;
-
-  const SubjectCard({Key? key, required this.subjectName}) : super(key: key);
-
-  @override
-  _SubjectCardState createState() => _SubjectCardState();
-}
-
-class _SubjectCardState extends State<SubjectCard> {
-  bool isExpanded = false;
-  bool isPresent = false;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchAttendanceStatus();
-  }
-
-  void fetchAttendanceStatus() async {
-
-    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(rollNumberOfStudent)
-        .get();
-    setState(() {
-      isPresent = userSnapshot['present'] ??
-          false; // Mevcut olma durumunu set et
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      color: lightest,
-      child: Column(
-        children: [
-          ListTile(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: Text(
-                    widget.subjectName,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            trailing: GestureDetector(
-              onTap: () {
-                setState(() {
-                  isExpanded = !isExpanded;
-                });
-              },
-              child: Icon(
-                isExpanded ? Icons.visibility_off : Icons.visibility,
-                color: darkest,
-              ),
-            ),
-          ),
-          Visibility(
-            visible: isExpanded,
-            child: SizedBox(
-              height: 50,
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Text(
-                  'Yoklama Durumun: ${isPresent ? 'Mevcut' : 'Yok'}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
