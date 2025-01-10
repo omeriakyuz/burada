@@ -6,6 +6,7 @@ import 'package:burada/colors.dart';
 import 'package:burada/main.dart';
 import 'package:burada/info.dart';
 import 'package:burada/animation.dart';
+import 'package:burada/roles/student/phone_auth.dart';
 
 class StudentHomePage extends StatefulWidget {
   const StudentHomePage({Key? key}) : super(key: key);
@@ -113,12 +114,11 @@ class _StudentHomePageState extends State<StudentHomePage> {
   }
 
   Future<QuerySnapshot> getSubjectsForCurrentSemester() async {
-    String currentUserSemester =
-        'III/II'; // Değiştirilecek
+    String rollNumber = rollNumberOfStudent;
 
     return FirebaseFirestore.instance
         .collection('subjects')
-        .where('semester', isEqualTo: currentUserSemester)
+        .where('studentList', arrayContains: rollNumber)
         .get();
   }
 }
