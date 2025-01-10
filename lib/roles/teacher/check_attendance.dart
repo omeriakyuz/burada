@@ -2,10 +2,8 @@ import 'package:burada/roles/teacher/teacher_base.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:burada/colors.dart';
-import 'package:burada/info.dart';
+import 'package:burada/roles/teacher/email_auth.dart';
 import 'package:intl/intl.dart';
-
-import 'email_auth.dart';
 
 class TeacherAttendancePage extends StatefulWidget {
   const TeacherAttendancePage({Key? key}) : super(key: key);
@@ -44,7 +42,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
   Widget build(BuildContext context) {
     return TeacherBasePage(
       title: 'Yoklama Kayıtları',
-      currentPageIndex: 2,
+      currentPageIndex: 1,
       buildBody: (context) => Column(
         children: [
           if (teacherSubjects.isNotEmpty) ...[
@@ -113,95 +111,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
                     itemBuilder: (context, index) {
                       final record = snapshot.data!.docs[index];
                       final data = record.data() as Map<String, dynamic>;
-                      final studentList = Map<String, bool>.from(data['studentList'] as Map);
-                      final date = data['date'] as String;
-                      
-                      // Katılan ve katılmayan öğrenci sayılarını hesapla
-                      int presentCount = studentList.values.where((present) => present).length;
-                      int totalCount = studentList.length;
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          color: lightest,
-                          elevation: 4,
-                          child: ExpansionTile(
-                            title: Text(
-                              date,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'Katılım: $presentCount/$totalCount',
-                              style: TextStyle(
-                                color: Colors.black87,
-                              ),
-                            ),
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Öğrenci Listesi:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    ...studentList.entries.map((entry) {
-                                      return FutureBuilder<DocumentSnapshot>(
-                                        future: FirebaseFirestore.instance
-                                            .collection('users')
-                                            .doc(entry.key)
-                                            .get(),
-                                        builder: (context, studentSnapshot) {
-                                          if (!studentSnapshot.hasData) {
-                                            return SizedBox.shrink();
-                                          }
-
-                                          final studentData = studentSnapshot.data!.data() as Map<String, dynamic>;
-                                          final studentName = studentData['name'] as String;
-
-                                          return Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  entry.value ? Icons.check_circle : Icons.cancel,
-                                                  color: entry.value ? Colors.green : Colors.red,
-                                                  size: 20,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Text(
-                                                    '$studentName (${entry.key})',
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    }).toList(),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      return AttendanceRecord(
+                        date: data['date'] as String,
+                        studentList: Map<String, bool>.from(data['studentList'] as Map),
                       );
                     },
                   );
@@ -216,6 +128,137 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class AttendanceRecord extends StatefulWidget {
+  final String date;
+  final Map<String, bool> studentList;
+
+  const AttendanceRecord({
+    Key? key,
+    required this.date,
+    required this.studentList,
+  }) : super(key: key);
+
+  @override
+  _AttendanceRecordState createState() => _AttendanceRecordState();
+}
+
+class _AttendanceRecordState extends State<AttendanceRecord> {
+  String searchQuery = '';
+
+  @override
+  Widget build(BuildContext context) {
+    int presentCount = widget.studentList.values.where((present) => present).length;
+    int totalCount = widget.studentList.length;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        color: lightest,
+        elevation: 4,
+        child: ExpansionTile(
+          title: Text(
+            widget.date,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          subtitle: Text(
+            'Katılım: $presentCount/$totalCount',
+            style: TextStyle(
+              color: Colors.black87,
+            ),
+          ),
+          children: [
+            Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Öğrenci Ara...',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value.toLowerCase();
+                      });
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Öğrenci Listesi:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  ...widget.studentList.entries.map((entry) {
+                    return FutureBuilder<DocumentSnapshot>(
+                      future: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(entry.key)
+                          .get(),
+                      builder: (context, studentSnapshot) {
+                        if (!studentSnapshot.hasData) {
+                          return SizedBox.shrink();
+                        }
+
+                        final studentData = studentSnapshot.data!.data() as Map<String, dynamic>;
+                        final studentName = studentData['name'] as String;
+
+                        if (searchQuery.isNotEmpty &&
+                            !studentName.toLowerCase().contains(searchQuery) &&
+                            !entry.key.toLowerCase().contains(searchQuery)) {
+                          return SizedBox.shrink();
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                entry.value ? Icons.check_circle : Icons.cancel,
+                                color: entry.value ? Colors.green : Colors.red,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '$studentName (${entry.key})',
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
