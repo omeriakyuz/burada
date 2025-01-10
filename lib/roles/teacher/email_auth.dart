@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:burada/colors.dart';
 import 'package:burada/roles/teacher/home.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:burada/info.dart';
@@ -33,12 +33,50 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
             (route) => false,
       );
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('Bu e-postaya sahip kullanıcı bulunamadı.');
-      } else if (e.code == 'wrong-password') {
-        print('Girmiş olduğunuz şifre hatalı.');
+      print("***HATA***: ${e.code} - ${e.message}");  // Hata mesajını da loglamak faydalı olur
+
+      switch (e.code) {
+        case 'user-not-found':
+          _showSnackbar('Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.');
+
+        case 'wrong-password':
+          _showSnackbar('Girdiğiniz şifre hatalı. Lütfen kontrol edip tekrar deneyin.');
+
+        case 'invalid-credential':
+          _showSnackbar('E-posta veya şifre hatalı. Lütfen bilgilerinizi kontrol edin.');
+
+        case 'invalid-email':
+          _showSnackbar('Geçersiz e-posta formatı. Lütfen kontrol edin.');
+
+        case 'user-disabled':
+          _showSnackbar('Bu hesap devre dışı bırakılmış. Lütfen yöneticinizle iletişime geçin.');
+
+        case 'too-many-requests':
+          _showSnackbar('Çok fazla başarısız giriş denemesi. Lütfen daha sonra tekrar deneyin.');
+
+        case 'channel-error':
+          _showSnackbar('Bağlantı hatası. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.');
+
+        case 'network-request-failed':
+          _showSnackbar('İnternet bağlantısı yok veya zayıf. Lütfen bağlantınızı kontrol edin.');
+
+        case 'operation-not-allowed':
+          _showSnackbar('E-posta/şifre ile giriş bu uygulama için devre dışı bırakılmış.');
+
+        default:
+          _showSnackbar('Giriş yapılırken bir hata oluştu. (Hata kodu: ${e.code})');
       }
+    } on Exception catch (e) {
+      // FirebaseAuthException dışındaki hataları yakalar
+      print("***GENEL HATA***: $e");
+      _showSnackbar('Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
     }
+  }
+
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: Duration(seconds: 3)),
+    );
   }
 
   Future<void> fetchTeacherDocument(String email) async {
@@ -60,13 +98,12 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
+    return Theme(
+      data: ThemeData(
         textTheme: GoogleFonts.nunitoTextTheme(),
         primarySwatch: Colors.blue,
       ),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+        child: Scaffold(
         appBar: AppBar(
           backgroundColor: darkest,
           foregroundColor: Colors.white,
@@ -92,7 +129,7 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
                 })
           ],
           title: const Text(
-            'E-Posta Doğrulama',
+            'Öğretmen Girişi',
           ),
           centerTitle: true,
         ),
@@ -100,8 +137,14 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 120),
-              Padding(
+              SizedBox(
+                height: 100,
+              ),
+              const Text(
+                'Kurumunuzun sistemine kayıtlı bilgileri kullanarak giriş yapabilirsiniz.',
+                style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),              Padding(
                 padding: const EdgeInsets.all(
                   20,
                 ),
@@ -145,7 +188,7 @@ class _TeacherEmailAuthState extends State<TeacherEmailAuth> {
                     ),
                     backgroundColor: secondDark,
                     foregroundColor: Colors.white),
-                child: const Text('Üye Ol'),
+                child: const Text('Giriş Yap'),
               ),
               SizedBox(height: 120),
             ],

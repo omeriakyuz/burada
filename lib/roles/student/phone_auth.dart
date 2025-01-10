@@ -33,12 +33,53 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
     auth.verifyPhoneNumber(
       phoneNumber: userNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await auth.signInWithCredential(credential).then(
-              (value) => print('Giriş başarılı.'),
-            );
+        try {
+          final userCredential = await auth.signInWithCredential(credential);
+          await fetchUserDocument(userCredential.user!.phoneNumber!);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const StudentHomePage()),
+                (route) => false,
+          );
+        } on FirebaseAuthException catch (e) {
+          print("***HATA***: ${e.code} - ${e.message}");
+          switch (e.code) {
+            case 'invalid-verification-code':
+              _showSnackbar('Geçersiz doğrulama kodu.');
+            case 'invalid-verification-id':
+              _showSnackbar('Geçersiz doğrulama ID\'si.');
+            case 'session-expired':
+              _showSnackbar('Doğrulama süresi doldu. Lütfen tekrar deneyin.');
+            case 'network-request-failed':
+              _showSnackbar('İnternet bağlantınızı kontrol edip tekrar deneyin.');
+            case 'too-many-requests':
+              _showSnackbar('Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.');
+            default:
+              _showSnackbar('Giriş yapılırken bir hata oluştu. (${e.code})');
+          }
+        } catch (e) {
+          print("***GENEL HATA***: $e");
+          _showSnackbar('Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.');
+        }
       },
       verificationFailed: (FirebaseAuthException e) {
-        print(e.message);
+        print("***DOĞRULAMA HATASI***: ${e.code} - ${e.message}");
+        switch (e.code) {
+          case 'invalid-phone-number':
+            _showSnackbar('Geçersiz telefon numarası formatı.');
+          case 'invalid-verification-code':
+            _showSnackbar('Geçersiz doğrulama kodu.');
+          case 'too-many-requests':
+            _showSnackbar('Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.');
+          case 'operation-not-allowed':
+            _showSnackbar('Telefon doğrulaması şu anda kullanılamıyor.');
+          case 'quota-exceeded':
+            _showSnackbar('SMS kotası aşıldı. Lütfen daha sonra tekrar deneyin.');
+          case 'user-disabled':
+            _showSnackbar('Bu hesap devre dışı bırakılmış.');
+          default:
+            _showSnackbar('Doğrulama sırasında hata: ${e.code}');
+        }
       },
       codeSent: (String verificationId, int? resendToken) {
         receivedID = verificationId;
@@ -47,23 +88,48 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
         });
       },
       codeAutoRetrievalTimeout: (String verificationId) {
-        print('TimeOut');
+        _showSnackbar('SMS kodu zaman aşımına uğradı. Lütfen tekrar deneyin.');
       },
     );
   }
 
   Future<void> verifyOTPCode() async {
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: receivedID,
-      smsCode: otpController.text,
-    );
-    await auth.signInWithCredential(credential).then((value) async {
-      await fetchUserDocument(value.user!.phoneNumber!);
-    });
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const StudentHomePage()),
-      (route) => false,
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: receivedID,
+        smsCode: otpController.text,
+      );
+
+      final userCredential = await auth.signInWithCredential(credential);
+      await fetchUserDocument(userCredential.user!.phoneNumber!);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const StudentHomePage()),
+            (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      print("***OTP HATASI***: ${e.code} - ${e.message}");
+      switch (e.code) {
+        case 'invalid-verification-code':
+          _showSnackbar('SMS kodu hatalı. Lütfen kontrol edip tekrar deneyin.');
+        case 'invalid-verification-id':
+          _showSnackbar('Doğrulama oturumu geçersiz. Tekrar kod talep edin.');
+        case 'session-expired':
+          _showSnackbar('Doğrulama süresi doldu. Yeni kod talep edin.');
+        case 'network-request-failed':
+          _showSnackbar('İnternet bağlantınızı kontrol edip tekrar deneyin.');
+        default:
+          _showSnackbar('Doğrulama sırasında hata oluştu. (${e.code})');
+      }
+    } catch (e) {
+      print("***GENEL HATA***: $e");
+      _showSnackbar('Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.');
+    }
+  }
+
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: Duration(seconds: 3)),
     );
   }
 
@@ -86,13 +152,12 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
+    return Theme(
+      data: ThemeData(
         textTheme: GoogleFonts.nunitoTextTheme(),
         primarySwatch: Colors.blue,
       ),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+      child: Scaffold(
         appBar: AppBar(
           backgroundColor: darkest,
           foregroundColor: Colors.white,
@@ -169,6 +234,11 @@ class _StudentPhoneAuthState extends State<StudentPhoneAuth> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
+                    keyboardType: TextInputType.number, // Sadece sayıları kabul et
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly, // Sadece rakam girişi
+                      LengthLimitingTextInputFormatter(6), // Maksimum 6 haneli giriş
+                    ],
                   ),
                 ),
               ),
